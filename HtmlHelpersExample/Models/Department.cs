@@ -1,0 +1,187 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+
+namespace HtmlHelpersExample.Models
+{
+    public class Department
+    {
+        public int DeptNo { get; set; }
+        public string DeptName { get; set; }
+
+        public static List<Department> GetAllDepartment()
+        {
+            List<Department> lstDeps = new List<Department>();
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = cn.ConnectionString = cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JKJuly2022;Integrated Security=True;MultipleActiveResultSets = true";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdSelect = new SqlCommand();
+                cmdSelect.Connection = cn;
+                cmdSelect.CommandType = CommandType.Text;
+                cmdSelect.CommandText = "Select * from Departments";
+
+                SqlDataReader dr = cmdSelect.ExecuteReader();
+                while (dr.Read())
+                {
+                    lstDeps.Add(new Department { DeptNo = (int)dr["DeptNo"], DeptName = (string)dr["DeptName"] });
+                }
+                dr.Close();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+
+            return lstDeps;
+        }
+
+
+
+        public static Department GetSingleDepartment(int DeptNo)
+        {
+
+            Department obj = new Department();
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JKJuly2022;Integrated Security=True;";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdSelect = new SqlCommand();
+                cmdSelect.Connection = cn;
+                cmdSelect.CommandType = CommandType.Text;
+                cmdSelect.CommandText = "select * from Departments where DeptNo=@DeptNo";
+                cmdSelect.Parameters.AddWithValue("@DeptNo", DeptNo);
+                SqlDataReader dr = cmdSelect.ExecuteReader();
+
+                if (dr.Read())
+                {
+                    obj.DeptNo = (int)dr["DeptNo"];
+                    obj.DeptName = (string)dr["DeptName"];
+                }
+
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+            return obj;
+        }
+
+
+        public static void InsertDepartment(Department obj)
+        {
+
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = cn.ConnectionString = cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JKJuly2022;Integrated Security=True;MultipleActiveResultSets = true";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdInsert = new SqlCommand();
+                cmdInsert.Connection = cn;
+                cmdInsert.CommandType = CommandType.Text;
+
+                cmdInsert.CommandText = $"insert into Departments values(@DeptNo,@DeptName)";
+                cmdInsert.Parameters.AddWithValue("@DeptNo", obj.DeptNo);
+                cmdInsert.Parameters.AddWithValue("@DeptName", obj.DeptName);
+                cmdInsert.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+
+        }
+
+
+
+        public static void UpdateDepartment(Department obj)
+        {
+
+
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = cn.ConnectionString = cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JKJuly2022;Integrated Security=True;MultipleActiveResultSets = true";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdUpdate = new SqlCommand();
+                cmdUpdate.Connection = cn;
+                cmdUpdate.CommandType = CommandType.Text;
+                cmdUpdate.CommandText = "Update Departments set DeptNo=@DeptNo, DeptName=@DeptName  where DeptNo=@DeptNo";
+
+                cmdUpdate.Parameters.AddWithValue("@DeptName", obj.DeptName);
+                cmdUpdate.Parameters.AddWithValue("@DeptNo", obj.DeptNo);
+
+                cmdUpdate.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+
+        }
+
+        public static void DeleteDepartment(int DeptNo)
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = cn.ConnectionString = cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JKJuly2022;Integrated Security=True;MultipleActiveResultSets = true";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmdDelete = new SqlCommand();
+                cmdDelete.Connection = cn;
+
+                cmdDelete.CommandType = CommandType.Text;
+                cmdDelete.CommandText = "Delete from Departments where DeptNo=@DeptNo";
+
+                cmdDelete.Parameters.AddWithValue("@DeptNo", DeptNo);
+
+                cmdDelete.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+
+        }
+
+
+
+
+    }
+}

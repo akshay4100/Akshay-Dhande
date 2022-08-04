@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+RenderPartial
+@*calling partial view method 1*@
+@{
+    Html.RenderPartial("PartialView1");
+}
+@*calling partial view method 2*@
+with html.partial.....
+@Html.Partial("PartialView1")
+
+<h2>After Partial</h2>
