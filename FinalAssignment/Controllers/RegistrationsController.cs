@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FinalAssignment.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,10 +9,30 @@ namespace FinalAssignment.Controllers
 {
     public class RegistrationsController : Controller
     {
+       
+        
         // GET: Registrations
         public ActionResult Index()
         {
+            var list = City.GetCities();
+            ViewBag.Cities = list;
+            
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult Index(Registration obj)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+                Registration.InsertRegistrationDetails(obj);
+                return RedirectToAction("Login");
+            }
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Registrations/Details/5
@@ -21,42 +42,102 @@ namespace FinalAssignment.Controllers
         }
 
         // GET: Registrations/Create
-        public ActionResult Create()
+        public ActionResult Login()
         {
-            return View();
-        }
+            string s=null, s2=null;
+            HttpCookie reqCookie = Request.Cookies["LoginDetails"];
+            if (reqCookie != null)
+            {
+                s = reqCookie.Values["UserLoginName"];
+                s2 = reqCookie.Values["UserPassword"];
+            }
 
-        // POST: Registrations/Create
+            if (s != null && s2 != null)
+                return RedirectToAction("Homepage");
+            else
+                return View();
+        }
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Login(Registration obj)
         {
             try
             {
                 // TODO: Add insert logic here
+                var list= Registration.verifyLogin(obj);
+                
+                if(obj.LoginName==list[0].LoginName&&obj.Password==list[0].Password)
+                {
+                    
+                    if (obj.RememberMe == true)
+                    {
+                        HttpCookie objCookie = new HttpCookie("LoginDetails");
+                        objCookie.Expires = DateTime.Now.AddDays(1);
+                        objCookie.Values["UserLoginName"] = obj.LoginName;
+                        objCookie.Values["UserPassword"] = obj.Password;
+                        objCookie.Values["UserFullName"] = list[0].FullName;
+                        Response.Cookies.Add(objCookie);
+                    }
 
-                return RedirectToAction("Index");
+                    Session["LoginName"] = list[0].LoginName;
+                    Session["FullName"] = list[0].FullName;
+                    
+                    return RedirectToAction("HomePage");
+                }
+                else
+                {
+                    
+                    return RedirectToAction("Login");
+                }
+               
             }
             catch
             {
-                return View();
+                return HttpNotFound();
             }
         }
 
-        // GET: Registrations/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult HomePage()
         {
+
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult HomePage(Registration obj)
+        {
+            HttpCookie objCookie = new HttpCookie("LoginDetails");
+            objCookie.Expires = DateTime.Now.AddDays (-1);
+            Response.Cookies.Add(objCookie);
+            Session.Abandon();
+            return RedirectToAction("Index","Home");
+        }
+
+        public ActionResult Welcome()
+        {
+            if (Session["LoginName"] != null)
+                return View();
+            else
+                return HttpNotFound();
+        }
+
+        // GET: Registrations/Edit/5
+        public ActionResult Edit(string id="")
+        {
+            var list = City.GetCities();
+            ViewBag.Cities = list;
+            Registration obj = Registration.getSingleUser(id);
+            return View(obj);
         }
 
         // POST: Registrations/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(string id = "", Registration obj=null)
         {
             try
             {
-                // TODO: Add update logic here
+                Registration.UpdateUser(obj);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("HomePage");
             }
             catch
             {
@@ -65,25 +146,6 @@ namespace FinalAssignment.Controllers
         }
 
         // GET: Registrations/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Registrations/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
     }
 }

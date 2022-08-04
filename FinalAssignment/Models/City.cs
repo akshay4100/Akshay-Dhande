@@ -10,7 +10,7 @@ namespace FinalAssignment.Models
     public class City
     {
         public int CityId { get; set; }
-        public string CityName { get; set; }
+        public string CityName{ get; set; }
 
         public static List<City> GetCities()
         {
@@ -24,12 +24,12 @@ namespace FinalAssignment.Models
                 SqlCommand cmdSelect = new SqlCommand();
                 cmdSelect.Connection = con;
                 cmdSelect.CommandType = CommandType.Text;
-                cmdSelect.CommandText = "select * from City ";
+                cmdSelect.CommandText = "select * from city";
 
                 SqlDataReader dr = cmdSelect.ExecuteReader();
                 while (dr.Read())
                 {
-
+                   
                     listCity.Add(new City { CityId = (int)dr["CityId"], CityName = (string)dr["City"] });
                 }
                 dr.Close();
